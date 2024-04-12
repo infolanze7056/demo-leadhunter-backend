@@ -1,36 +1,105 @@
-require("dotenv").config();
+// require("dotenv").config();
+// const express = require("express");
+// const app = express();
+// const cookieParser = require("cookie-parser");
+// const connectDB = require("./database/db");
+// const cors = require("cors");
+// const routes = require("./Auth/route");
+// const leadroute = require("./routes/leadroute");
+
+// // const loginroute = require("./routes/loginroute");
+// const passwordReset = require("./Auth/passwordReset");
+// // const { adminAuth, userAuth } = require("./middleware/auth");
+// const phonepeRoute = require("./routes/phoneperoute");
+
+// // const phonepeRouteTwo = require("./Auth/route")
+
+// const { userRouter } = require("./Auth/route");
+
+// connectDB();
+
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+// app.use(cookieParser());
+// app.use(cors({ origin: "http://localhost:3000" }));
+
+// // 01/04/2024
+// app.get("/", (req, res) => res.render("home"));
+
+// app.get("/logout", (req, res) => {
+//   res.cookie("jwt", "", { maxAge: "1" });
+//   res.redirect("/");
+// });
+// // 01/04/2024
+
+// // Authentication routes
+// app.use("/api/auth", require("./Auth/route"));
+
+// // Additional routes with authentication middleware
+// app.use("/api/routes", routes);
+// app.use("/api/passwordReset", passwordReset);
+
+// app.use("/api/phonepe", phonepeRoute);
+// // app.use("/api/phonepe", phonepeRouteTwo);
+
+// // Adding admin and basic routes with their respective middleware
+// // app.get("/api/admin", adminAuth, (req, res) => res.send("Admin Route"));
+// // app.get("/api/basic", userAuth, (req, res) => res.send("User Route"));
+
+// app.use("/api/leads", leadroute);
+
+// app.use("/api/v1", userRouter);
+
+// app.get("/api/getkey", (req, res) =>
+//   res.status(200).json({ key: process.env.KEY_ID })
+// );
+
+// const PORT = process.env.PORT || 5000;
+// const server = app.listen(PORT, () =>
+//   console.log(`Server connected to port ${PORT}`)
+// );
+
+// process.on("unhandledRejection", (err) => {
+//   console.log(`An error occurred: ${err.message}`);
+//   server.close(() => process.exit(1));
+// });
+
+
+
+
 const express = require("express");
-const app = express();
 const cookieParser = require("cookie-parser");
 const connectDB = require("./database/db");
-const cors = require("cors");
+const cors = require('cors');
+const bcrypt = require('bcrypt');
 const routes = require("./Auth/route");
-const leadroute = require("./routes/leadroute");
-
-// const loginroute = require("./routes/loginroute");
 const passwordReset = require("./Auth/passwordReset");
-// const { adminAuth, userAuth } = require("./middleware/auth");
+const { adminAuth, userAuth } = require("./middleware/auth");
 const phonepeRoute = require("./routes/phoneperoute");
-
-// const phonepeRouteTwo = require("./Auth/route")
-
 const { userRouter } = require("./Auth/route");
+
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const app = express(); // Initialize express app here
+
+app.use(cors( { origin:'https://demo-lead-hunter.vercel.app', credentials:true })); // Now you can use cors middleware after initializing app
+// app.use(cors( { origin:'http://localhost:3000', credentials:true }));
 
 connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({ origin: "http://localhost:3000" }));
 
-// 01/04/2024
 app.get("/", (req, res) => res.render("home"));
 
 app.get("/logout", (req, res) => {
-  res.cookie("jwt", "", { maxAge: "1" });
-  res.redirect("/");
+res.cookie("jwt", "", { maxAge: "0" });
+// res.redirect("/");
+res.status(200).json({ message: 'Logged out successfully' });
 });
-// 01/04/2024
 
 // Authentication routes
 app.use("/api/auth", require("./Auth/route"));
@@ -40,26 +109,25 @@ app.use("/api/routes", routes);
 app.use("/api/passwordReset", passwordReset);
 
 app.use("/api/phonepe", phonepeRoute);
-// app.use("/api/phonepe", phonepeRouteTwo);
 
 // Adding admin and basic routes with their respective middleware
-// app.get("/api/admin", adminAuth, (req, res) => res.send("Admin Route"));
-// app.get("/api/basic", userAuth, (req, res) => res.send("User Route"));
+app.get("/api/admin", adminAuth, (req, res) => res.send("Admin Route"));
+app.get("/api/basic", userAuth, (req, res) => res.send("User Route"));
 
-app.use("/api/leads", leadroute);
+app.use('/api/leads', routes);
+// app.use("/api/leads", userAuth, routes);
 
 app.use("/api/v1", userRouter);
 
 app.get("/api/getkey", (req, res) =>
-  res.status(200).json({ key: process.env.KEY_ID })
+    res.status(200).json({ key: process.env.KEY_ID })
 );
 
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () =>
-  console.log(`Server connected to port ${PORT}`)
-);
+const server = app.listen(PORT, () => console.log(`Server connected to port ${PORT}`));
 
-process.on("unhandledRejection", (err) => {
-  console.log(`An error occurred: ${err.message}`);
-  server.close(() => process.exit(1));
+process.on("unhandledRejection", err => {
+    console.log(`An error occurred: ${err.message}`);
+    server.close(() => process.exit(1));
 });
+
