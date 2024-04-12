@@ -26,6 +26,16 @@ router.delete('/:id', leadController.deleteLeadById);
 // Route to fetch leads by tag
 router.get('/tag', leadController.getLeadsByTag);
 
+// Route to search leads by tag
+router.get('/search', leadController.getSearchByTag);
+
+// GET /leads/platform - Get leads by platform
+router.get("/platform", leadController.getLeadsByPlatform);
+
+// Define route for getting leads by platform and tag
+// router.get("/platformtag", leadController.getLeadsByPlatformAndTag); // Get leads by platform and tag
+router.get('/leads/search', leadController.getLeadsByPlatformAndTag);
+
 
 router.route("/user").post(addUser)
 

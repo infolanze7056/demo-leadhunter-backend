@@ -46,7 +46,8 @@ router.post("/", async (req, res) => {
             }, 60000);
         }
 
-        const link = `https://lead-hunter-olive.vercel.app/api/passwordReset/${user._id}/${token.token}`;
+        // const link = `https://lead-hunter-olive.vercel.app/api/passwordReset/${user._id}/${token.token}`;
+        const link = `${process.env.BASE_URL}/api/passwordReset/${user._id}/${token.token}`;
         
         await sendEmail(user.email, "Password reset", "Password reset link:", link, user.email);
 
