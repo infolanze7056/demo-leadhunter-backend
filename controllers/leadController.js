@@ -16,13 +16,13 @@ exports.createLead = async (req, res) => {
 // Get all leads
 exports.getAllLeads = async (req, res) => {
     try {
-        // Fetch leads from the database, sorted by timestamp in descending order
-        const leads = await LeadData.find().sort({ createdAt: -1 });
+        // const leads = await LeadData.find();
+        const leads = await LeadData.find().sort({ createdAt: -1});
         res.status(200).json(leads);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
-}
+};
 
 
 // Delete a lead by ID
@@ -45,11 +45,11 @@ exports.deleteLeadById = async (req, res) => {
 exports.getLeadsByTag = async (req, res) => {
     let selectedtags;
     // Check if tags are provided in the request body
-    if (req.body.tags && typeof req.body.tags === 'string') {
+    if (req.query.tags && typeof req.query.tags === 'string') {
         // Split the string by comma and trim extra whitespace
-        selectedtags = req.body.tags.split(',').map(tag => tag.trim());
-    } else if (Array.isArray(req.body.tags)) {
-        selectedtags = req.body.tags;
+        selectedtags = req.query.tags.split(',').map(tag => tag.trim());
+    } else if (Array.isArray(req.query.tags)) {
+        selectedtags = req.query.tags;
     } else {
         return res.status(400).json({ message: "Tags parameter is required as a non-empty array or comma-separated string" });
     }
@@ -76,145 +76,3 @@ exports.getLeadsByTag = async (req, res) => {
         res.status(500).json({ message: "An error occurred while fetching leads" });
     }
 };
-
-
-
-//Fetch leads by Platforms
-// const LeadData = require('./LeadData'); // Import the LeadData model or module
-
-exports.getLeadsByPlatform = async (req, res) => {
-    let selectedPlatforms;
-    // Check if platforms are provided in the request body
-    if (req.body.platforms && typeof req.body.platforms === 'string') {
-        // Split the string by comma and trim extra whitespace
-        selectedPlatforms = req.body.platforms.split(',').map(platform => platform.trim());
-    } else if (Array.isArray(req.body.platforms)) {
-        selectedPlatforms = req.body.platforms;
-    } else {
-        return res.status(400).json({ message: "Platforms parameter is required as a non-empty array or comma-separated string" });
-    }
-
-    try {
-        if (selectedPlatforms.length === 0) {
-            return res.status(400).json({ message: "Platforms parameter is required as a non-empty array" });
-        }
-
-        // Find leads that contain the specified platforms
-        const leads = await LeadData.find({ platforms: { $in: selectedPlatforms } });
-
-        if (leads.length === 0) {
-            return res.status(404).json({ message: "No leads found for the specified platform(s)" });
-        }
-
-        res.status(200).json({ leads });
-    } catch (err) {
-        console.error("Error retrieving leads by platform:", err);
-        res.status(500).json({ message: "An error occurred while retrieving leads" });
-    }
-};
-
-
-
-//Fetch leads by Platforms and Tags
-
-exports.getLeadsByPlatformAndTag = async (req, res) => {
-    let selectedPlatforms = [];
-    let selectedTags = [];
-
-    // Parse platforms from the request
-    if (req.body.platforms) {
-        selectedPlatforms = typeof req.body.platforms === 'string' ? 
-                            req.body.platforms.split(',').map(platform => platform.trim()) : 
-                            req.body.platforms;
-    }
-
-    // Parse tags from the request
-    if (req.body.tags) {
-        selectedTags = typeof req.body.tags === 'string' ? 
-                       req.body.tags.split(',').map(tag => tag.trim()) : 
-                       req.body.tags;
-    }
-
-    // Check if at least one of the filters is provided
-    if (selectedPlatforms.length === 0 && selectedTags.length === 0) {
-        return res.status(400).json({ message: "At least one of the platforms or tags parameters is required." });
-    }
-
-    try {
-        // Construct a query object based on provided filters
-        let query = {};
-        if (selectedPlatforms.length > 0) {
-            // Using case-insensitive search for platforms
-            query.platforms = { $in: selectedPlatforms.map(platform => new RegExp(platform, 'i')) };
-        }
-        if (selectedTags.length > 0) {
-            // Using case-insensitive search for tags, removing word boundaries for broader matching
-            const regexPattern = selectedTags.map(tag => `${tag}`).join('|');
-            query.tags = { $regex: new RegExp(regexPattern, 'i') };
-        }
-
-        // Find leads based on the constructed query
-        const leads = await LeadData.find(query);
-
-        if (leads.length === 0) {
-            return res.status(404).json({ message: "No leads found matching the criteria." });
-        }
-
-        res.status(200).json(leads);
-    } catch (err) {
-        console.error("Error fetching leads by platform and tag:", err);
-        res.status(500).json({ message: "An error occurred while fetching leads" });
-    }
-};
-
-
-
-// search reference in only tags 
-
-exports.getSearchByTag = async (req, res) => {
-    let selectedtags;
-    // Check if tags are provided in the request body
-    if (req.body.tags && typeof req.body.tags === 'string') {
-        // Split the string by comma and trim extra whitespace
-        selectedtags = req.body.tags.split(',').map(tag => tag.trim());
-    } else if (Array.isArray(req.body.tags)) {
-        selectedtags = req.body.tags;
-    } else {
-        return res.status(400).json({ message: "Tags parameter is required as a non-empty array or comma-separated string" });
-    }
-
-    try {
-        if (selectedtags.length === 0) {
-            return res.status(400).json({ message: "Tags parameter is required as a non-empty array" });
-        }
-
-        // Construct a regex pattern to match any part of the tag names
-        const regexPattern = selectedtags.map(tag => `${tag}`).join('|');
-        const regex = new RegExp(regexPattern, 'i');
-
-        // Find leads that contain any tag matching the regex pattern
-        const leads = await LeadData.find({ tags: { $regex: regex } });
-
-        if (leads.length === 0) {
-            return res.status(404).json({ message: `No leads found for the provided tag(s)` });
-        }
-
-        // Extract unique tags from the found leads
-        const tagsInLeads = leads.reduce((acc, lead) => {
-            if (Array.isArray(lead.tags)) {
-                lead.tags.forEach(tag => {
-                    if (!acc.includes(tag)) {
-                        acc.push(tag);
-                    }
-                });
-            }
-            return acc;
-        }, );
-
-        res.status(200).json({ tags: tagsInLeads });
-    } catch (err) {
-        console.error("Error fetching tags by query:", err);
-        res.status(500).json({ message: "An error occurred while fetching tags" });
-    }
-};
-

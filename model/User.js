@@ -1,5 +1,6 @@
+// const bcrypt = require("bcrypt");
 const bcrypt = require("bcrypt");
-const Mongoose = require("mongoose")
+const Mongoose = require("mongoose");
 
 
 const UserSchema = new Mongoose.Schema({
@@ -19,7 +20,7 @@ const UserSchema = new Mongoose.Schema({
     required: [true,"Password is required"]
   },
   amount: {
-    type: String,
+    type: Number,
     required: [true, "Amount required"]
   },
   phonenumber: {
@@ -38,12 +39,12 @@ const UserSchema = new Mongoose.Schema({
   },
   // transaction_id: {
   //   type : String,
-  //   // required : [true, "id not provided"]
+  //   required : [true, "id not provided"]
   // },
   payment_status: {
     type : String,
     enum : ['PENDING','SUCCESSFUL','FAILED'],
-    default : "PENDING"
+    default : "SUCCESSFUL"
   }
 },{timestamps : true})
 

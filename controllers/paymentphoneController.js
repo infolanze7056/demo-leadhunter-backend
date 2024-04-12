@@ -23,7 +23,8 @@ async function newPayment(req, res) {
       merchantUserId: "MUID2QWQEFW5Q6WSER7",
       name: name,
       amount: amount * 100, // Convert amount to cents
-      redirectUrl: "http://localhost:5000/api/phonepe/status/",
+      redirectUrl: "https://lead-backend.vercel.app/api/phonepe/status/",
+      // redirectUrl: "process.env.BASE_URL/api/phonepe/status/",
       redirectMode: "POST",
       email: email,
       role: role,
@@ -158,17 +159,20 @@ async function statusCheck(req, res) {
 
         await req_data.save();
 
-        const url = `http://localhost:3000/pay-success/${transaction_id}`;
+        // const url = `https://lead-hunter-olive.vercel.app/pay-success/${transaction_id}`;
+        const url = `${process.env.BASE_URL}/pay-success/${transaction_id}`;
         return res.redirect(url);
       } else {
-        const url = `http://localhost:3000/register?status=failed`;
+        // const url = `https://lead-hunter-olive.vercel.app/register?status=failed`;
+        const url = `${process.env.BASE_URL}/register?status=failed`;
         return res.redirect(url);
       } 
     })
     .catch((error) => { 
-      const url = `http://localhost:3000/register?status=failed`;
+      console.error("An error occurred:", error);
+      // const url = `https://lead-hunter-olive.vercel.app/register?status=failed`;
+      const url = `${process.env.BASE_URL}/register?status=failed`;
       return res.redirect(url);
-      console.error(error);
     });
 };
 

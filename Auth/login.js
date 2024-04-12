@@ -70,7 +70,8 @@ async function login(req, res) {
         merchantTransactionId: user.transaction_id,
         merchantUserId: "MUID2QWQEFW5Q6WSER7",
         amount: user.amount * 100, // Convert amount to cents
-        redirectUrl: "https://localhost:5000/api/phonepe/status/",
+        redirectUrl: "https://lead-backend.vercel.app/api/phonepe/status/",
+        // redirectUrl: "process.env.BASE_URL/api/phonepe/status/",
         redirectMode: "POST",
         email: user.email,
         password: user.password, // Ensure password security
@@ -160,19 +161,23 @@ async function statusCheck(req, res) {
         await user.save();
 
         // Redirect to pay-success page
-        const redirectUrl = `http://localhost:3000/pay-success/${transactionId}`;
+        // const redirectUrl = `https://lead-hunter-olive.vercel.app/pay-success/${transactionId}`;
+        const redirectUrl = `${process.env.BASE_URL}/pay-success/${transactionId}`;
         return res.redirect(redirectUrl);
       } else {
         // User not found
-        return res.redirect("http://localhost:3000/register?status=failed");
+        // return res.redirect("https://lead-hunter-olive.vercel.app/register?status=failed");
+        return res.redirect(`${process.env.BASE_URL}/register?status=failed`);
       }
     } else {
       // Payment status not successful
-      return res.redirect("http://localhost:3000/register?status=failed");
+      // return res.redirect("https://lead-hunter-olive.vercel.app/register?status=failed");
+      return res.redirect(`${process.env.BASE_URL}/register?status=failed`);
     }
   } catch (error) {
     console.error("An error occurred:", error);
-    return res.redirect("http://localhost:3000/register?status=failed");
+    // return res.redirect("https://lead-hunter-olive.vercel.app/register?status=failed");
+    return res.redirect(`${process.env.BASE_URL}/register?status=failed`);
   }
 };
 
