@@ -19,7 +19,7 @@ const UserSchema = new Mongoose.Schema({
     required: [true,"Password is required"]
   },
   amount: {
-    type: Number,
+    type: String,
     required: [true, "Amount required"]
   },
   phonenumber: {
@@ -36,10 +36,10 @@ const UserSchema = new Mongoose.Schema({
     default: "Basic",
     required: true,
   },
-  transaction_id: {
-    type : String,
-    required : [true, "id not provided"]
-  },
+  // transaction_id: {
+  //   type : String,
+  //   // required : [true, "id not provided"]
+  // },
   payment_status: {
     type : String,
     enum : ['PENDING','SUCCESSFUL','FAILED'],
