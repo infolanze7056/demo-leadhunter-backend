@@ -90,3 +90,5 @@ router.route("/register").post(createNewUser)
 
 
 module.exports = router
+
+module.exports.userRouter = userRouter;
