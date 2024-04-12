@@ -37,6 +37,8 @@ router.get("/platform", leadController.getLeadsByPlatform);
 router.get('/leads/search', leadController.getLeadsByPlatformAndTag);
 
 
+router.get('/technology', leadController.getTechnology);
+
 router.route("/user").post(addUser)
 
 router.route('/status').post(statusCheck);

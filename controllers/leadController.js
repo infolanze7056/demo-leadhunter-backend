@@ -77,7 +77,6 @@ exports.getLeadsByTag = async (req, res) => {
     }
 };
 
-
 //Fetch leads by Platforms
 
 exports.getLeadsByPlatform = async (req, res) => {
@@ -219,3 +218,73 @@ exports.getSearchByTag = async (req, res) => {
         res.status(500).json({ message: "An error occurred while fetching tags" });
     }
 };
+
+
+
+// Technology
+
+// exports.getTechnology = async (req, res) => {
+//     try {
+//         // Get the technology from the query parameter
+//         const technology = req.body.Technology;
+
+//         if (!technology) {
+//             return res.status(400).json({ message: "Technology parameter is required" });
+//         }
+
+//         // Define an array of valid technologies
+//         const validTechnologies = ["Blockchain", "Web", "App"];
+
+//         // Check if the provided technology is valid
+//         if (!validTechnologies.includes(technology)) {
+//             return res.status(400).json({ message: "Invalid technology provided" });
+//         }
+
+//         // Find leads matching any of the specified technologies
+//         const leads = await LeadData.find({ Technology: technology });
+
+//         if (leads.length === 0) {
+//             return res.status(404).json({ message: `No leads found for the provided technology` });
+//         }
+
+//         res.status(200).json(leads);
+//     } catch (err) {
+//         console.error("Error fetching leads by technology:", err);
+//         res.status(500).json({ message: "An error occurred while fetching leads" });
+//     }
+// };
+
+
+exports.getTechnology = async (req, res) => {
+    try {
+        // Get the technology from the query parameter or the request body and convert to lowercase
+        const technology = (req.query.Technology || req.body.Technology || '').toLowerCase();
+
+        if (!technology) {
+            return res.status(400).json({ message: "Technology parameter is required" });
+        }
+
+        // Define an array of valid technologies
+        const validTechnologies = ["blockchain", "web", "app"];
+
+        // Check if the provided technology is valid (case-insensitive)
+        if (!validTechnologies.includes(technology)) {
+            return res.status(400).json({ message: "Invalid technology provided" });
+        }
+
+        // Find leads matching any of the specified technologies (case-insensitive)
+        const leads = await LeadData.find({ Technology: new RegExp(technology, 'i') });
+
+        if (leads.length === 0) {
+            return res.status(404).json({ message: `No leads found for the provided technology` });
+        }
+
+        res.status(200).json(leads);
+    } catch (err) {
+        console.error("Error fetching leads by technology:", err);
+        res.status(500).json({ message: "An error occurred while fetching leads" });
+    }
+};
+
+
+

@@ -7,6 +7,7 @@ const leadDataSchema = new Schema({
     description: { type: String, required: true },
     tags: { type: Schema.Types.Mixed, required: true },
     level: { type: String, required: true },
+    Technology: {type: String},
     duration: String,
     budget: String,
     link: String
